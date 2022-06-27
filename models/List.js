@@ -6,7 +6,7 @@ const ListSchema = new mongoose.Schema({
     genre: { type: String, },
     content: { type: Array }
 }, {
-    timestamps: ture,
+    timestamps: true,
 })
 
 module.exports = mongoose.model("List", ListSchema)
