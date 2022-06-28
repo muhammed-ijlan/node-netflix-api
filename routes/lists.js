@@ -1,16 +1,16 @@
 const router = require("express").Router();
-const Movie = require("../models/Movie");
-const List = require('../routes/')
+const { aggregate } = require("../models/List");
+const List = require('../models/List')
 const verify = require("../verifyToken");
 
 //Create Movie
 router.post("/", verify, async (req, res) => {
     if (req.user.isAdmin) {
-        const newMovie = new Movie(req.body)
+        const newList = new List(req.body)
 
         try {
-            const savedMovie = await newMovie.save();
-            res.status(201).json(savedMovie)
+            const savedList = await newList.save();
+            res.status(201).json(savedList)
 
         } catch (err) {
             res.status(500).json(err)
@@ -21,5 +21,56 @@ router.post("/", verify, async (req, res) => {
     }
 });
 
+//Delete 
+router.delete("/:id", verify, async (req, res) => {
+    if (req.user.isAdmin) {
+        try {
+            await List.findByIdAndDelete(req.params.id)
+            res.status(201).json("Successfully deleted")
+        } catch (err) {
+            res.status(500)
+        }
+    } else {
+        res.status(403).json("You are not able to perform this action")
+    }
+})
+
+//Get
+router.get("/", verify, async (req, res) => {
+    try {
+        const typeQuery = req.query.type;
+        const genreQuery = req.query.genre;
+
+        let list = [];
+
+        try {
+            if (typeQuery) {
+                if (genreQuery) {
+                    list = await List.aggregate([
+                        { $sample: { size: 10 } },
+                        { $match: { type: typeQuery, genre: genreQuery } }
+                    ])
+                }
+
+                list = await List.aggregate([
+                    { $sample: { size: 10 } },
+                    { $match: { type: typeQuery } }
+                ])
+
+            } else {
+                list = await List.aggregate([{ $sample: { size: 10 } }])
+            }
+
+            res.status(200).json(list)
+
+        } catch (err) {
+            res.status(500).json(err)
+        }
+
+    } catch (err) {
+
+    }
+})
+//Get Random
 
 module.exports = router;
