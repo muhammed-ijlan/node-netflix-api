@@ -11,6 +11,13 @@ dotenv.config();
 
 const app = express()
 
+const corsOptions = {
+    origin: 'http://localhost:4000/',
+    credentials: true,
+    optionSuccessStatus: 200
+}
+app.use(cors(corsOptions));
+
 //DB Connection
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
@@ -19,7 +26,6 @@ mongoose.connect(process.env.MONGO_URL, {
     console.log("DB Connected")
 }).catch(err => console.log(err))
 
-app.use(cors())
 app.use(express.json())
 app.use("/api/auth", authRoute)
 app.use("/api/users", userRoute)
