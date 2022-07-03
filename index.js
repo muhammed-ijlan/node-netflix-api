@@ -12,7 +12,7 @@ dotenv.config();
 const app = express()
 
 const corsOptions = {
-    origin: 'http://localhost:4000/',
+    origin: 'https://netflix-mern-2022.herokuapp.com/api/',
     credentials: true,
     optionSuccessStatus: 200
 }
